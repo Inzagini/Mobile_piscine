@@ -83,19 +83,19 @@ fun App(modifier: Modifier = Modifier)
         Values(Modifier.padding(innerPadding), inputStr, result)
         Buttons(
             Modifier.padding(innerPadding),
-            onNumberClick = { value -> state = onNumberClick(state, value)}
+            onNumberClick = { value -> inputStr = onNumberClick(inputStr, value)}
         )
 
     }
 }
 
-fun onNumberClick (state: CalState, value: String) : CalState
+fun onNumberClick (inputStr: String, value: String) : String
 {
     return when (value) {
-        "AC" -> CalState()
-        "C" -> state.copy( inputStr = state.inputStr.dropLast(1))
-
-        else -> state.copy(inputStr = state.inputStr + value)
+        "AC" -> ""
+        "C" -> inputStr.dropLast(1)
+        "=" -> calculateResult(inputStr)
+        else -> inputStr + value
     }
 }
 
