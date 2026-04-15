@@ -80,22 +80,69 @@ fun App(modifier: Modifier = Modifier)
     )
     {
         innerPadding ->
-        Values(Modifier.padding(innerPadding), inputStr, result)
+        Values(Modifier.padding(innerPadding), state.inputStr, state.result)
         Buttons(
             Modifier.padding(innerPadding),
-            onNumberClick = { value -> inputStr = onNumberClick(inputStr, value)}
+            onNumberClick = { value -> state = onNumberClick(state, value)}
         )
 
     }
 }
 
-fun onNumberClick (inputStr: String, value: String) : String
+fun onNumberClick (state: CalState, value: String) : CalState
 {
+    val opListString =listOf<String>("+", "-", "x", "/")
+    val opListChar=listOf<Char>('+', '-', 'x', '/')
+
     return when (value) {
-        "AC" -> ""
-        "C" -> inputStr.dropLast(1)
-        "=" -> calculateResult(inputStr)
-        else -> inputStr + value
+        "AC" -> { state.copy(
+            inputStr = "",
+            result = "0"
+        )}
+        "C" -> { state.copy(inputStr = state.inputStr.dropLast(1))}
+        "=" -> {
+            state.copy(
+                result = calculateResult(state.inputStr),
+                inputStr = ""
+            )
+        }
+        else -> {
+
+            if (value == "."){
+
+                if (state.inputStr.isEmpty()){
+                    Log.d("PARS", "append first 0")
+                    state.inputStr = "0"
+                }
+                else if (state.inputStr.last() == '.'){
+                    Log.d("PARS", "Drop one additional .")
+                    state.inputStr = state.inputStr.dropLast(1)
+                }
+
+            }
+
+            if (value in opListString && state.inputStr.isNotEmpty() &&
+                state.inputStr.last() in listOf('+', '-', 'x', '/')){
+
+                if (value == "-" && state.inputStr.last() in listOf('/', 'x')){
+
+                }
+                else if (value in opListString && state.inputStr.getOrNull(state.inputStr.length - 2) in listOf('x', '/'))
+                {
+                    state.inputStr = state.inputStr.dropLast(2)
+                }
+                else{
+                    state.inputStr = state.inputStr.dropLast(1)
+                }
+
+            }
+
+            if (value != "-" && value in opListString && state.inputStr.isEmpty()){
+                return state
+            }
+
+            state.copy(inputStr = state.inputStr + value)
+        }
     }
 }
 
@@ -127,7 +174,7 @@ fun evaluate(tokens: List<String>): Double
 
     for (x in tokens)
     {
-        if (x.isDigitsOnly()){
+        if (x.toDoubleOrNull() != null){
             val value = x.toDoubleOrNull()
             if (value != null)
                 stack.add(value)
@@ -144,8 +191,13 @@ fun evaluate(tokens: List<String>): Double
                 res = left - right
             else if (x == "*")
                 res = left * right
-            else if (x == "/" && right != 0.0)
+            else if (x == "/")
+            {
+                if (right == 0.0)
+                    throw IllegalArgumentException()
                 res = left / right
+            }
+
 
             stack.add(res)
         }
@@ -196,6 +248,7 @@ fun precedense(op: String): Int{
 fun tokenize(input: String): List<String>
 {
     var tokenList = mutableListOf<String>()
+    var minus = false
     var number = ""
 
     for (c in input)
@@ -205,16 +258,28 @@ fun tokenize(input: String): List<String>
         else if (c == '.')
             number += c
         else if (c in listOf('x', '/', '+', '-')){
-            if (number.isNotEmpty()){
+            if(c == '-' && number.isEmpty()){
+                minus = true
+            }
+            else if (number.isNotEmpty()){
+
+                if (minus)
+                    number = "-" + number
+
                 tokenList.add(number)
                 number = ""
+
+                tokenList.add( if (c == 'x') "*" else c.toString())
             }
-            tokenList.add( if (c == 'x') "*" else c.toString())
         }
     }
 
-    if (number.isNotEmpty())
+    if (number.isNotEmpty()){
+        if (minus)
+            number = "-" + number
         tokenList.add(number)
+    }
+
     return tokenList
 }
 

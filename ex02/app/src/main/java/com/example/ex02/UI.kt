@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ex02.ButtonNumber
@@ -49,8 +50,8 @@ fun Values (modifier: Modifier = Modifier, input: String, result: String)
         verticalArrangement = Arrangement.Top
     )
     {
-        Text(text = result, color = Color.White, fontSize = 80.sp)
-        Text(text = input, color = Color.White,fontSize = 60.sp)
+        Text(text = result, color = Color.White, fontSize = 80.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text = input, color = Color.White,fontSize = 60.sp, maxLines = 1, overflow = TextOverflow.StartEllipsis)
 
         Spacer(Modifier.height(100.dp))
     }
