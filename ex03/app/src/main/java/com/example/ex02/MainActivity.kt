@@ -165,7 +165,10 @@ fun calculateResult(inputStr: String): String
         Log.d("EXPR", inputStr)
 
         var tokens = tokenize(inputStr)
+        Log.d("TOKENS", tokens.toString())
+
         var parsedTokens = ShuntingYardAlgo(tokens)
+        Log.d("PARSED TOKENS", parsedTokens.toString())
 
         var res = evaluate(parsedTokens).toString()
         if (res.endsWith(".0") && res.length >= 2){
@@ -213,8 +216,11 @@ fun evaluate(tokens: List<String>): Double
             stack.add(res)
         }
     }
-    if (stack.isNotEmpty())
+
+    if (stack.isNotEmpty()){
         return stack.last()
+    }
+
     return 0.0
 }
 
@@ -274,8 +280,11 @@ fun tokenize(input: String): List<String>
             }
             else if (number.isNotEmpty()){
 
-                if (minus)
+                if (minus){
                     number = "-" + number
+                    minus = false
+                }
+
 
                 tokenList.add(number)
                 number = ""
