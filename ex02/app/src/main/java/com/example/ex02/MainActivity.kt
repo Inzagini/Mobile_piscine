@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -65,13 +66,11 @@ data class CalState (
     var result: String = "0"
 )
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(modifier: Modifier = Modifier)
 {
-    var inputStr by remember { mutableStateOf("") }
-    var result by remember {mutableStateOf("0")}
     var state by remember {mutableStateOf(CalState())}
 
     Scaffold (
@@ -80,11 +79,23 @@ fun App(modifier: Modifier = Modifier)
     )
     {
         innerPadding ->
-        Values(Modifier.padding(innerPadding), state.inputStr, state.result)
-        Buttons(
-            Modifier.padding(innerPadding),
-            onNumberClick = { value -> state = onNumberClick(state, value)}
-        )
+
+            Column (modifier = Modifier.fillMaxSize().padding( top =innerPadding.calculateTopPadding()),
+                horizontalAlignment = Alignment.End)
+            {
+
+                Values(
+                    modifier = modifier,
+                    input = state.inputStr,
+                    result = state.result
+                )
+
+
+                Buttons(
+                    modifier = Modifier.padding(innerPadding),
+                    onNumberClick = { value -> state = onNumberClick(state, value) }
+                )
+            }
 
     }
 }
@@ -283,10 +294,3 @@ fun tokenize(input: String): List<String>
     return tokenList
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Ex02Theme {
-        App()
-    }
-}
