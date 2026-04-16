@@ -42,6 +42,7 @@ import com.example.ex02.ui.theme.DarkNavyBlue
 import com.example.ex02.ui.theme.Ex02Theme
 import com.example.ex02.ui.theme.LightNavyBlue
 import com.example.ex02.ui.theme.Pink80
+import java.math.BigDecimal
 
 
 class MainActivity : ComponentActivity() {
@@ -170,7 +171,7 @@ fun calculateResult(inputStr: String): String
         var parsedTokens = ShuntingYardAlgo(tokens)
         Log.d("PARSED TOKENS", parsedTokens.toString())
 
-        var res = evaluate(parsedTokens).toString()
+        var res = evaluate(parsedTokens)
         if (res.endsWith(".0") && res.length >= 2){
             res = res.dropLast(2)
         }
@@ -182,22 +183,21 @@ fun calculateResult(inputStr: String): String
     }
 }
 
-fun evaluate(tokens: List<String>): Double
+fun evaluate(tokens: List<String>): String
 {
-    var stack = ArrayDeque<Double>()
+    var stack = ArrayDeque<BigDecimal>()
 
     for (x in tokens)
     {
         if (x.toDoubleOrNull() != null){
-            val value = x.toDoubleOrNull()
-            if (value != null)
-                stack.add(value)
+            val value = BigDecimal(x)
+            stack.add(value)
         }
         else {
             val right = stack.removeLast()
             val left = stack.removeLast()
 
-            var res = 0.0
+            var res = BigDecimal.ZERO
 
             if (x == "+")
                 res = left + right
@@ -207,7 +207,7 @@ fun evaluate(tokens: List<String>): Double
                 res = left * right
             else if (x == "/")
             {
-                if (right == 0.0)
+                if (right == BigDecimal.ZERO)
                     throw IllegalArgumentException()
                 res = left / right
             }
@@ -218,10 +218,10 @@ fun evaluate(tokens: List<String>): Double
     }
 
     if (stack.isNotEmpty()){
-        return stack.last()
+        return stack.last().toString()
     }
 
-    return 0.0
+    return "0"
 }
 
 //Reorder of the tokens
