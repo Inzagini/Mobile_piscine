@@ -5,13 +5,17 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,6 +60,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Weather_appApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.CURRENT) }
+    var pagerState = rememberPagerState(initialPage = currentDestination.ordinal, pageCount = { AppDestinations.entries.size})
+    var scope = rememberCoroutineScope()
     val textFieldState = rememberTextFieldState()
 
     NavigationSuiteScaffold(
@@ -70,8 +76,8 @@ fun Weather_appApp() {
                         )
                     },
                     label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    selected = it.ordinal == pagerState.currentPage,
+                    onClick = { scope.launch { pagerState.animateScrollToPage(it.ordinal) }}
                 )
             }
         }
@@ -82,10 +88,9 @@ fun Weather_appApp() {
         { innerPadding ->
             val cityName = textFieldState.text.toString()
 
-            Column(
+            HorizontalPager(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                state = pagerState
                 ) {
                 when (currentDestination) {
                     AppDestinations.CURRENT -> CurrentScreen(modifier = Modifier.padding(innerPadding),
@@ -142,7 +147,7 @@ fun _SearchBar(textFieldState: TextFieldState, modifier: Modifier)
     SearchBar(
         modifier = Modifier.statusBarsPadding()
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp),
+                .padding(horizontal = 10.dp).padding(top = 10.dp),
         state = searchBarState,
         inputField = inputField,
 
@@ -152,22 +157,46 @@ fun _SearchBar(textFieldState: TextFieldState, modifier: Modifier)
 @Composable
 fun CurrentScreen(modifier: Modifier, cityName: String)
 {
-    Text("Current Screen \n $cityName", modifier = modifier, textAlign = TextAlign.Center, fontSize = 20.sp)
+    Box (modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center) {
+        Text(
+            "Current Screen \n $cityName",
+            modifier = modifier,
+            textAlign = TextAlign.Center,
+            fontSize = 20.sp
+        )
+    }
 }
 
 @Composable
 fun TodayScreen(modifier: Modifier, cityName: String)
 {
-    Text("Today screen \n $cityName", modifier = modifier, textAlign = TextAlign.Center, fontSize = 20.sp)
+    Box (modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center)
+    {
+        Text(
+            "Today screen \n $cityName",
+            modifier = modifier,
+            textAlign = TextAlign.Center,
+            fontSize = 20.sp
+        )
+    }
 }
 
 @Composable
 fun WeeklyScreen(modifier: Modifier, cityName: String)
 {
-    Text("Weekly Screen \n $cityName", modifier = modifier, textAlign = TextAlign.Center, fontSize = 20.sp)
+    Box (modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center)
+    {
+        Text(
+            "Weekly Screen \n $cityName",
+            modifier = modifier,
+            textAlign = TextAlign.Center,
+            fontSize = 20.sp
+        )
+    }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable
