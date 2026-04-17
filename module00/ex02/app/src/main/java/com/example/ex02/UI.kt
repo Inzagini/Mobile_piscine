@@ -56,7 +56,7 @@ fun ColumnScope.Values (modifier: Modifier, input: String, result: String)
 
         Text(
             modifier = modifier.weight(1.5f),
-            text = result,
+            text = "0",
             color = Color.White,
             fontSize = fontSizeResult,
             maxLines = 1,
@@ -64,7 +64,7 @@ fun ColumnScope.Values (modifier: Modifier, input: String, result: String)
         )
         Text(
             modifier = Modifier.weight(1.5f),
-            text = input,
+            text = "0",
             color = Color.White,
             fontSize = fontSizeInput,
             maxLines = 1,
